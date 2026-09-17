@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaeliX Immobilien & Weltkarte</title>
+    
+    <!-- Google Fonts für eine schöne Schrift -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: url('https://i1.pickpik.com/photos/654/912/932/galaxy-infinity-milky-way-orbit-preview.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Dunkler Overlay für bessere Lesbarkeit */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 5, 25, 0.55);
+            backdrop-filter: blur(2px);
+            z-index: 1;
+        }
+
+        /* Hauptcontainer */
+        .menu-container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 480px;
+            background: rgba(20, 15, 35, 0.75);
+            border: 1px solid rgba(180, 140, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Titel */
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            letter-spacing: 4px;
+            color: #e2c0ff;
+            text-shadow: 0 0 15px rgba(186, 85, 211, 0.8);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #b3a5d0;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* User Profil Statusanzeige */
+        .user-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 15px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-status img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #a855f7;
+        }
+
+        .user-status span {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Menü Buttons */
+        .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.8), rgba(58, 12, 95, 0.8));
+            border: 1px solid rgba(192, 132, 252, 0.4);
+            color: #ffffff;
+            padding: 14px 20px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .menu-btn:hover {
+            background: linear-gradient(135deg, rgba(126, 34, 206, 0.9), rgba(88, 28, 135, 0.9));
+            border-color: #c084fc;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+        }
+
+        .menu-btn.login-btn {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.8));
+            border-color: rgba(52, 211, 153, 0.5);
+        }
+
+        .menu-btn.login-btn:hover {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.9), rgba(16, 185, 129, 0.9));
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.6);
+        }
+
+        .menu-btn.logout-btn {
+            background: rgba(220, 38, 38, 0.6);
+            border-color: rgba(248, 113, 113, 0.4);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        /* Modal / Pop-ups (Optionen) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1a102f;
+            border: 1px solid #a855f7;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+        }
+
+        .modal-content h2 {
+            font-family: 'Cinzel', serif;
+            color: #e2c0ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .setting-row {
+            margin-bottom: 18px;
+        }
+
+        .setting-row label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: #d8b4fe;
+        }
+
+        .setting-row input[type="range"] {
+            width: 100%;
+            accent-color: #a855f7;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            width: 100%;
+            background: #4c1d95;
+            border: none;
+            padding: 10px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="menu-container">
+        <h1>CAELIX</h1>
+        <p class="subtitle">Immobilien & Weltkarte</p>
+
+        <!-- Google Login Status -->
+        <div class="user-status" id="user-status">
+            <span id="user-name">Nicht angemeldet</span>
+        </div>
+
+        <!-- Menü-Punkte -->
+        <div class="btn-list">
+            <button class="menu-btn login-btn" id="auth-btn" onclick="toggleLogin()">Anmelden mit Google</button>
+            
+            <button class="menu-btn" onclick="openBauMenu()">🔨 Bauen</button>
+            <button class="menu-btn" onclick="openWeltkarte()">🗺️ Weltkarte ansehen</button>
+            <button class="menu-btn" onclick="openOptionen()">⚙️ Optionen</button>
+        </div>
+    </div>
+
+    <!-- Optionen Pop-Up Fenster -->
+    <div class="modal" id="options-modal">
+        <div class="modal-content">
+            <h2>Einstellungen</h2>
+            
+            <div class="setting-row">
+                <label for="brightness">Helligkeit</label>
+                <input type="range" id="brightness" min="50" max="150" value="100" oninput="changeBrightness(this.value)">
+            </div>
+
+            <div class="setting-row">
+                <label for="music">Musik-Lautstärke</label>
+                <input type="range" id="music" min="0" max="100" value="70">
+            </div>
+
+            <div class="setting-row">
+                <label for="sfx">Effekt-Lautstärke (SFX)</label>
+                <input type="range" id="sfx" min="0" max="100" value="80">
+            </div>
+
+            <button class="close-btn" onclick="closeOptionen()">Speichern & Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------
+        // 1. FIREBASE KONFIGURATION (DEINE ECHTEN SCHLÜSSEL)
+        // -------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPKcLz9PHXrdXPIo7nXXAoviMy3iI-LdI",
+            authDomain: "caelix-immobilie.firebaseapp.com",
+            projectId: "caelix-immobilie",
+            storageBucket: "caelix-immobilie.firebasestorage.app",
+            messagingSenderId: "746238817765",
+            appId: "1:746238817765:web:6eb238182917fe64aeeb0c",
+            measurementId: "G-1EHP6PR204"
+        };
+
+        // Firebase initialisieren
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        let currentUser = null;
+
+        // -------------------------------------------------------------
+        // 2. GOOGLE LOGIN SYSTEM
+        // -------------------------------------------------------------
+        auth.onAuthStateChanged((user) => {
+            const statusDiv = document.getElementById('user-status');
+            const authBtn = document.getElementById('auth-btn');
+
+            if (user) {
+                currentUser = user;
+                statusDiv.innerHTML = `
+                    <img src="${user.photoURL}" alt="Avatar">
+                    <span>${user.displayName}</span>
+                `;
+                authBtn.innerText = "Abmelden";
+                authBtn.classList.remove('login-btn');
+                authBtn.classList.add('logout-btn');
+            } else {
+                currentUser = null;
+                statusDiv.innerHTML = `<span>Nicht angemeldet</span>`;
+                authBtn.innerText = "Anmelden mit Google";
+                authBtn.classList.add('login-btn');
+                authBtn.classList.remove('logout-btn');
+            }
+        });
+
+        function toggleLogin() {
+            if (currentUser) {
+                auth.signOut();
+            } else {
+                const provider = new firebase.GoogleAuthProvider();
+                auth.signInWithPopup(provider).catch((error) => {
+                    alert("Fehler beim Anmelden: " + error.message);
+                });
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 3. MENÜ-NAVIGATION
+        // -------------------------------------------------------------
+        function openBauMenu() {
+            alert("Leite weiter zur Bezirks-Karte für Immobilien...");
+            // Hier kommt später der Link zu deiner Map hin:
+            // window.location.href = "map.html";
+        }
+
+        function openWeltkarte() {
+            alert("Öffne die Weltkarte (Bewohner-Übersicht)...");
+            // Hier kommt später die Bewohner-Listen-Map hin:
+            // window.location.href = "bewohner_map.html";
+        }
+
+        // -------------------------------------------------------------
+        // 4. OPTIONEN (HELLIGKEIT & TON)
+        // -------------------------------------------------------------
+        function openOptionen() {
+            document.getElementById('options-modal').style.display = 'flex';
+        }
+
+        function closeOptionen() {
+            document.getElementById('options-modal').style.display = 'none';
+        }
+
+        function changeBrightness(val) {
+document.body.style.filter = `brightness(${val}%)`;
+        }
+    </script>
+</body>
+</html>
