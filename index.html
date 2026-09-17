@@ -4,10 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaeliX Immobilien & Weltkarte</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
     <style>
-        /* Deine bestehenden Styles bleiben komplett erhalten */
-        .add-form { margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
-        .back-btn { position: absolute; top: 20px; left: 20px; z-index: 15; width: auto; padding: 10px 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: url('https://i1.pickpik.com/photos/654/912/932/galaxy-infinity-milky-way-orbit-preview.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 5, 25, 0.55); backdrop-filter: blur(2px); z-index: 1;
+        }
+
+        /* --- HAUPTMENÜ --- */
+        .menu-container {
+            position: relative; z-index: 2; width: 90%; max-width: 440px;
+            background: rgba(20, 15, 35, 0.85);
+            border: 1px solid rgba(180, 140, 255, 0.3);
+            border-radius: 20px; padding: 35px 25px; text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 3px;
+            color: #e2c0ff; text-shadow: 0 0 15px rgba(186, 85, 211, 0.8);
+        }
+
+        .subtitle { font-size: 0.85rem; color: #b3a5d0; margin-bottom: 20px; }
+
+        .auth-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .auth-title { font-size: 1rem; color: #d8b4fe; font-weight: 600; margin-bottom: 5px; }
+
+        .auth-box input, .add-form input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            padding: 10px; border-radius: 8px; color: #fff; font-size: 0.85rem;
+            outline: none; width: 100%; margin-bottom: 8px;
+        }
+        .auth-box input::placeholder, .add-form input::placeholder { color: #aaa; }
+
+        .auth-btn-group { display: flex; gap: 10px; }
+
+        .btn {
+            background: linear-gradient(135deg, rgba(126, 34, 206, 0.8), rgba(88, 28, 135, 0.8));
+            border: 1px solid rgba(192, 132, 252, 0.4); color: #fff; padding: 12px;
+            font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer;
+            width: 100%; transition: all 0.2s ease;
+        }
+        .btn:hover { background: rgba(168, 85, 247, 0.9); }
+        .btn-sec { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+
+        .user-info {
+            background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.4);
+            padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none;
+        }
+
+        .menu-list { display: flex; flex-direction: column; gap: 10px; }
+
+        /* --- WELTKARTEN OVERLAY --- */
+        #mapScreen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #08040d; z-index: 10; display: none; overflow: hidden;
+        }
+
+        .map-viewport {
+            width: 100%; height: 100%; position: relative;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+
+        .map-wrapper {
+            position: relative; width: 100%; max-width: 1200px; height: 90vh;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-origin: center center;
+        }
+
+        .map-wrapper img {
+            width: 100%; height: 100%; object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
+        }
+
+        /* Hotspots */
+        .district-hotspot {
+            position: absolute; border-radius: 50%; cursor: pointer;
+            border: 2px dashed rgba(216, 180, 254, 0.6);
+            background: rgba(138, 43, 226, 0.15);
+            transition: all 0.3s ease;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .district-hotspot:hover {
+            background: rgba(168, 85, 247, 0.4);
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(192, 132, 252, 0.8);
+        }
+        .district-label {
+            font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 700;
+            color: #ffffff; text-shadow: 0 0 8px #000; pointer-events: none;
+            background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 5px;
+            text-align: center;
+        }
+
+        /* Info-Box für Bezirke & Bewohner */
+        .district-info-panel {
+            position: absolute; top: 20px; right: 20px; width: 330px;
+            background: rgba(20, 15, 35, 0.92); border: 1px solid rgba(180, 140, 255, 0.4);
+            border-radius: 15px; padding: 20px; color: #fff; z-index: 15;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); display: none;
+        }
+        .district-info-panel h2 { font-family: 'Cinzel', serif; color: #e2c0ff; margin-bottom: 2px; }
+        .capital-name { font-size: 0.85rem; color: #a7f3d0; margin-bottom: 10px; font-weight: 600; }
+        
+        .resident-list { margin-top: 10px; max-height: 200px; overflow-y: auto; text-align: left; }
+        .resident-item {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem;
+        }
+        .resident-item strong { color: #d8b4fe; }
+
+        .add-form { margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: none; }
+
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; z-index: 15; width: auto; padding: 10px 20px;
+        }
     </style>
 </head>
 <body>
@@ -22,13 +156,118 @@
 
     <!-- MUSIK BUTTON (Unten Links) -->
     <div style="position: fixed; bottom: 20px; left: 20px; z-index: 100;">
-        <button class="btn btn-sec" onclick="toggleMusic()" id="musicBtn" style="padding: 8px 15px; font-size: 0.8rem; cursor: pointer;">
-            🎵 Musik an
+        <button class="btn btn-sec" onclick="toggleMusic()" id="musicBtn" style="padding: 8px 15px; font-size: 0.8rem;">
+            🔇 Musik an
         </button>
     </div>
 
-    <!-- SCRIPT FÜR DEN MUSIK-PLAYER -->
+    <!-- MAIN MENU -->
+    <div class="menu-container" id="mainMenu">
+        <h1>CAELIX</h1>
+        <div class="subtitle">Immobilien & Weltkarte</div>
+
+        <div class="user-info" id="userInfo">
+            <span id="userEmail"></span>
+        </div>
+
+        <div class="auth-box" id="authBox">
+            <div class="auth-title">Login / Registrieren</div>
+            <input type="email" id="email" placeholder="E-Mail Adresse">
+            <input type="password" id="password" placeholder="Passwort">
+            
+            <div class="auth-btn-group">
+                <button class="btn" onclick="login()">Einloggen</button>
+                <button class="btn btn-sec" onclick="register()">Registrieren</button>
+            </div>
+        </div>
+
+        <button class="btn btn-sec" id="logoutBtn" style="display:none; margin-bottom: 15px;" onclick="logout()">Abmelden</button>
+
+        <div class="menu-list">
+            <button class="btn">⚒️ Bauen</button>
+            <button class="btn" onclick="openMap()">🗺️ Weltkarte ansehen</button>
+            <button class="btn btn-sec">⚙️ Optionen</button>
+        </div>
+    </div>
+
+    <!-- MAP OVERLAY -->
+    <div id="mapScreen">
+        <button class="btn btn-sec back-btn" onclick="closeMapOrResetZoom()">← Zurück</button>
+
+        <!-- BEZIRKS INFO PANEL -->
+        <div class="district-info-panel" id="infoPanel">
+            <h2 id="districtTitle">Bezirk Name</h2>
+            <div class="capital-name" id="districtCapital">Hauptstadt: -</div>
+            
+            <div class="resident-list">
+                <div style="font-weight: 600; margin-bottom: 5px; color: #e2c0ff;">🏘️ Bewohner & Apartments:</div>
+                <div id="residentEntries">
+                    <!-- Wird dynamisch befüllt -->
+                </div>
+            </div>
+
+            <!-- Eintragen Formular (Nur für den Admin sichtbar) -->
+            <div class="add-form" id="adminAddForm">
+                <div style="font-weight: 600; font-size: 0.85rem; color: #d8b4fe; margin-bottom: 8px;">+ Bewohner/Wohnung eintragen</div>
+                <input type="text" id="newHouse" placeholder="Haus / Apt. (z.B. Haus 3)">
+                <input type="text" id="newResident" placeholder="Bewohner Name">
+                <button class="btn" style="padding: 8px; font-size: 0.85rem;" onclick="addResident()">Eintragen</button>
+            </div>
+        </div>
+
+        <div class="map-viewport">
+            <div class="map-wrapper" id="mapWrapper">
+                <img src="https://i.postimg.cc/vmxxxsqX/map-caeli11.png" alt="Caeli Weltkarte">
+
+                <!-- 7 Bezirke Hotspots mit Hauptstädten -->
+                <div class="district-hotspot" style="top: 25%; left: 30%; width: 12%; height: 18%;" onclick="zoomToDistrict('Bolivora', 'Cascadia', 30, 25)">
+                    <span class="district-label">Bolivora</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 20%; left: 55%; width: 14%; height: 20%;" onclick="zoomToDistrict('Norvalla', 'Grimskov', 55, 20)">
+                    <span class="district-label">Norvalla</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 45%; left: 20%; width: 13%; height: 18%;" onclick="zoomToDistrict('Goryeo', 'Liuyin', 20, 45)">
+                    <span class="district-label">Goryeo</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 45%; left: 45%; width: 15%; height: 22%;" onclick="zoomToDistrict('Danubia', 'Boskar', 45, 45)">
+                    <span class="district-label">Danubia</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 50%; left: 70%; width: 12%; height: 18%;" onclick="zoomToDistrict('Aridia', 'Riyassa', 70, 50)">
+                    <span class="district-label">Aridia</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 70%; left: 35%; width: 14%; height: 18%;" onclick="zoomToDistrict('Vistalia', 'Solmara', 35, 70)">
+                    <span class="district-label">Vistalia</span>
+                </div>
+
+                <div class="district-hotspot" style="top: 72%; left: 60%; width: 12%; height: 18%;" onclick="zoomToDistrict('Rosvalise', 'Blumburry', 60, 72)">
+                    <span class="district-label">Rosvalise</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPKcLz9PHXrdXPIo7nXA0ViMy3iI-LoI",
+            authDomain: "caelix-immobilie.firebaseapp.com",
+            projectId: "caelix-immobilie",
+            storageBucket: "caelix-immobilie.firebasestorage.app",
+            messagingSenderId: "746238817765",
+            appId: "1:746238817765:web:6eb238182917fe64aeeb0c"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Admin-E-Mail definieren
+        const ADMIN_EMAIL = "caelixadmin@gmail.com";
+
+        // Musik-Steuerung
         const music = document.getElementById('bgMusic');
         music.volume = 0.3; // Lautstärke auf 30%
 
@@ -38,19 +277,141 @@
                 document.getElementById('musicBtn').innerText = "🔊 Musik aus";
             } else {
                 music.pause();
-                document.getElementById('musicBtn').innerText = "🎵 Musik an";
+                document.getElementById('musicBtn').innerText = "🔇 Musik an";
             }
         }
+
+        auth.onAuthStateChanged((user) => {
+            const adminForm = document.getElementById('adminAddForm');
+
+            if (user) {
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('userEmail').innerText = "Eingeloggt als: " + user.email;
+
+                // Prüfen, ob der eingeloggte User der Admin ist
+                if (user.email === ADMIN_EMAIL) {
+                    adminForm.style.display = 'block';
+                } else {
+                    adminForm.style.display = 'none';
+                }
+            } else {
+                document.getElementById('authBox').style.display = 'flex';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                adminForm.style.display = 'none';
+            }
+        });
+
+        function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) return alert("Bitte E-Mail & Passwort eingeben.");
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => alert("Registrierung erfolgreich!"))
+                .catch(e => alert("Fehler: " + e.message));
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) return alert("Bitte E-Mail & Passwort eingeben.");
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(e => alert("Fehler beim Login: " + e.message));
+        }
+
+        function logout() { auth.signOut(); }
+
+        /* --- MAP & BEZIRKE LOGIC --- */
+        let isZoomed = false;
+        let currentDistrict = "";
+
+        const BEZIRKE_DATEN = {
+            "Bolivora": [],
+            "Norvalla": [],
+            "Goryeo": [],
+            "Danubia": [],
+            "Aridia": [],
+            "Vistalia": [],
+            "Rosvalise": []
+        };
+
+        function openMap() {
+            document.getElementById('mapScreen').style.display = 'block';
+        }
+
+        function closeMapOrResetZoom() {
+            if (isZoomed) {
+                const wrapper = document.getElementById('mapWrapper');
+                wrapper.style.transform = "scale(1) translate(0px, 0px)";
+                document.getElementById('infoPanel').style.display = 'none';
+                isZoomed = false;
+            } else {
+                document.getElementById('mapScreen').style.display = 'none';
+            }
+        }
+
+        function zoomToDistrict(name, capital, xPercent, yPercent) {
+            currentDistrict = name;
+            const wrapper = document.getElementById('mapWrapper');
+            
+            const translateX = (50 - xPercent) * 0.8;
+            const translateY = (50 - yPercent) * 0.8;
+
+            wrapper.style.transform = `scale(1.2) translate(${translateX}%, ${translateY}%)`;
+            isZoomed = true;
+
+            document.getElementById('districtTitle').innerText = name;
+            document.getElementById('districtCapital').innerText = "Hauptstadt: " + capital;
+
+            renderResidents();
+            document.getElementById('infoPanel').style.display = 'block';
+        }
+
+        function renderResidents() {
+            const listContainer = document.getElementById('residentEntries');
+            listContainer.innerHTML = "";
+
+            const eintraege = BEZIRKE_DATEN[currentDistrict] || [];
+
+            if (eintraege.length === 0) {
+                listContainer.innerHTML = "<div style='color: #aaa; font-size:0.8rem;'>Noch keine Bewohner eingetragen.</div>";
+            } else {
+                eintraege.forEach(item => {
+                    listContainer.innerHTML += `
+                        <div class="resident-item">
+                            🏢 <strong>${item.haus}</strong><br>
+                            👤 ${item.bewohner}
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function addResident() {
+            const user = auth.currentUser;
+            if (!user || user.email !== ADMIN_EMAIL) {
+                return alert("Keine Berechtigung! Nur der Administrator darf Bewohner eintragen.");
+            }
+
+            const house = document.getElementById('newHouse').value.trim();
+            const resident = document.getElementById('newResident').value.trim();
+
+            if (!house || !resident) {
+                return alert("Bitte Haus/Wohnung und Bewohner eintragen.");
+            }
+
+            if (!BEZIRKE_DATEN[currentDistrict]) {
+                BEZIRKE_DATEN[currentDistrict] = [];
+            }
+
+            BEZIRKE_DATEN[currentDistrict].push({ haus: house, bewohner: resident });
+
+            document.getElementById('newHouse').value = "";
+            document.getElementById('newResident').value = "";
+            renderResidents();
+        }
     </script>
-
-    <!-- MAIN MENU -->
-    <div class="menu-container" id="mainMenu">
-        <h1>CAELIX</h1>
-        <div class="subtitle">Immobilien & Weltkarte</div>
-        <div class="user-info" id="userInfo">
-            <span id="userEmail"></span>
-        </div>
-    </div>
-
 </body>
 </html>
