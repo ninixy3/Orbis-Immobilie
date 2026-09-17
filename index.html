@@ -5,21 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CaeliX Immobilien & Weltkarte</title>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (Compat-Versionen für einfache Nutzung) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -34,132 +27,60 @@
         }
 
         .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 5, 25, 0.55);
-            backdrop-filter: blur(2px);
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 5, 25, 0.55); backdrop-filter: blur(2px); z-index: 1;
         }
 
         .menu-container {
-            position: relative;
-            z-index: 2;
-            width: 90%;
-            max-width: 480px;
-            background: rgba(20, 15, 35, 0.75);
+            position: relative; z-index: 2; width: 90%; max-width: 440px;
+            background: rgba(20, 15, 35, 0.85);
             border: 1px solid rgba(180, 140, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow:
-                0 0 30px rgba(138, 43, 226, 0.3),
-                inset 0 0 15px rgba(255, 255, 255, 0.05);
+            border-radius: 20px; padding: 35px 25px; text-align: center;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
         }
 
         h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 2.8rem;
-            letter-spacing: 4px;
-            color: #e2c0ff;
-            text-shadow: 0 0 15px rgba(186, 85, 211, 0.8);
-            margin-bottom: 5px;
+            font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 3px;
+            color: #e2c0ff; text-shadow: 0 0 15px rgba(186, 85, 211, 0.8);
         }
 
-        .subtitle {
-            font-size: 0.9rem;
-            color: #b3a5d0;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
+        .subtitle { font-size: 0.85rem; color: #b3a5d0; margin-bottom: 20px; }
+
+        .auth-box {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
         }
 
-        .user-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 10px 15px;
-            border-radius: 30px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            min-height: 55px;
+        .auth-title {
+            font-size: 1rem; color: #d8b4fe; font-weight: 600; margin-bottom: 5px;
         }
 
-        .user-status img {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #a855f7;
+        .auth-box input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            padding: 12px; border-radius: 8px; color: #fff; font-size: 0.95rem;
+            outline: none; text-align: center;
         }
 
-        .user-status span {
-            font-size: 0.95rem;
-            font-weight: 600;
+        .auth-box input::placeholder { color: #aaa; }
+
+        .auth-btn-group { display: flex; gap: 10px; }
+
+        .btn {
+            background: linear-gradient(135deg, rgba(126, 34, 206, 0.8), rgba(88, 28, 135, 0.8));
+            border: 1px solid rgba(192, 132, 252, 0.4); color: #fff; padding: 12px;
+            font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer;
+            width: 100%; transition: all 0.2s ease;
         }
 
-        .btn-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        .btn:hover { background: rgba(168, 85, 247, 0.9); }
+        .btn-sec { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+
+        .user-info {
+            background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.4);
+            padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none;
         }
 
-        .menu-btn {
-            background: linear-gradient(
-                135deg,
-                rgba(88, 28, 135, 0.8),
-                rgba(58, 12, 95, 0.8)
-            );
-            border: 1px solid rgba(192, 132, 252, 0.4);
-            color: #ffffff;
-            padding: 14px 20px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            letter-spacing: 0.5px;
-        }
-
-        .menu-btn:hover {
-            background: linear-gradient(
-                135deg,
-                rgba(126, 34, 206, 0.9),
-                rgba(88, 28, 135, 0.9)
-            );
-            border-color: #c084fc;
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
-        }
-
-        .menu-btn.login-btn {
-            background: linear-gradient(
-                135deg,
-                rgba(16, 185, 129, 0.8),
-                rgba(5, 150, 105, 0.8)
-            );
-            border-color: rgba(52, 211, 153, 0.5);
-        }
-
-        .menu-btn.login-btn:hover {
-            background: linear-gradient(
-                135deg,
-                rgba(52, 211, 153, 0.9),
-                rgba(16, 185, 129, 0.9)
-            );
-            box-shadow: 0 0 20px rgba(52, 211, 153, 0.6);
-        }
-
-        .menu-btn.logout-btn {
-            background: rgba(220, 38, 38, 0.6);
-            border-color: rgba(248, 113, 113, 0.4);
-            font-size: 0.85rem;
-            padding: 6px 12px;
-            border-radius: 8px;
-        }
+        .menu-list { display: flex; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
@@ -170,83 +91,85 @@
         <h1>CAELIX</h1>
         <div class="subtitle">Immobilien & Weltkarte</div>
 
-        <div class="user-status" id="userStatus">
-            <span id="userName">Nicht angemeldet</span>
+        <!-- Status bei erfolgreicher Anmeldung -->
+        <div class="user-info" id="userInfo">
+            <span id="userEmail"></span>
         </div>
 
-        <div class="btn-list">
-            <button class="menu-btn login-btn" id="authBtn" onclick="toggleLogin()">Anmelden mit Google</button>
-            <button class="menu-btn">⚒️ Bauen</button>
-            <button class="menu-btn">🗺️ Weltkarte ansehen</button>
-            <button class="menu-btn">⚙️ Optionen</button>
+        <!-- Login / Registrieren Bereich -->
+        <div class="auth-box" id="authBox">
+            <div class="auth-title">Login / Registrieren</div>
+            <input type="email" id="email" placeholder="E-Mail Adresse">
+            <input type="password" id="password" placeholder="Passwort">
+            
+            <div class="auth-btn-group">
+                <button class="btn" onclick="login()">Einloggen</button>
+                <button class="btn btn-sec" onclick="register()">Registrieren</button>
+            </div>
+        </div>
+
+        <button class="btn btn-sec" id="logoutBtn" style="display:none; margin-bottom: 15px;" onclick="logout()">Abmelden</button>
+
+        <!-- Hauptmenü Buttons -->
+        <div class="menu-list">
+            <button class="btn">⚒️ Bauen</button>
+            <button class="btn">🗺️ Weltkarte ansehen</button>
+            <button class="btn btn-sec">⚙️ Optionen</button>
         </div>
     </div>
 
     <script>
-        // 1. ZUERST Variable für User deklarieren
-        let currentUser = null;
-
-        // 2. Firebase Konfiguration
         const firebaseConfig = {
             apiKey: "AIzaSyBPKcLz9PHXrdXPIo7nXA0ViMy3iI-LoI",
             authDomain: "caelix-immobilie.firebaseapp.com",
             projectId: "caelix-immobilie",
             storageBucket: "caelix-immobilie.firebasestorage.app",
             messagingSenderId: "746238817765",
-            appId: "1:746238817765:web:6eb238182917fe64aeeb0c",
-            measurementId: "G-1EHP6PR204"
+            appId: "1:746238817765:web:6eb238182917fe64aeeb0c"
         };
 
-        // 3. Firebase initialisieren
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // 4. Status der Anmeldung überwachen
+        // Login Status Überwachung
         auth.onAuthStateChanged((user) => {
-            const userNameEl = document.getElementById('userName');
-            const authBtn = document.getElementById('authBtn');
-            const userStatusEl = document.getElementById('userStatus');
-
             if (user) {
-                currentUser = user;
-                userNameEl.innerText = user.displayName || "Caeli-Mitglied";
-                
-                // Profilbild hinzufügen, falls vorhanden
-                if (user.photoURL) {
-                    let img = userStatusEl.querySelector('img');
-                    if (!img) {
-                        img = document.createElement('img');
-                        userStatusEl.insertBefore(img, userNameEl);
-                    }
-                    img.src = user.photoURL;
-                }
-
-                authBtn.innerText = "Abmelden";
-                authBtn.classList.remove('login-btn');
-                authBtn.classList.add('logout-btn');
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+                document.getElementById('userEmail').innerText = "Eingeloggt als: " + user.email;
             } else {
-                currentUser = null;
-                userNameEl.innerText = "Nicht angemeldet";
-                
-                const img = userStatusEl.querySelector('img');
-                if (img) img.remove();
-
-                authBtn.innerText = "Anmelden mit Google";
-                authBtn.classList.remove('logout-btn');
-                authBtn.classList.add('login-btn');
+                document.getElementById('authBox').style.display = 'flex';
+                document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
             }
         });
 
-        // 5. An-/Abmelden Funktion
-        function toggleLogin() {
-            if (currentUser) {
-                auth.signOut();
-            } else {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(provider).catch((error) => {
-                    alert("Fehler beim Anmelden: " + error.message);
-                });
+        function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) {
+                alert("Bitte gib eine E-Mail-Adresse und ein Passwort ein.");
+                return;
             }
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => alert("Registrierung erfolgreich! Du bist jetzt eingeloggt."))
+                .catch(error => alert("Fehler bei Registrierung: " + error.message));
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) {
+                alert("Bitte gib deine E-Mail-Adresse und dein Passwort ein.");
+                return;
+            }
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => alert("Fehler beim Login: " + error.message));
+        }
+
+        function logout() {
+            auth.signOut();
         }
     </script>
 </body>
