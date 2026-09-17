@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -161,34 +160,94 @@
             padding: 6px 12px;
             border-radius: 8px;
         }
+    </style>
+</head>
+<body>
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
+    <div class="overlay"></div>
+
+    <div class="menu-container">
+        <h1>CAELIX</h1>
+        <div class="subtitle">Immobilien & Weltkarte</div>
+
+        <div class="user-status" id="userStatus">
+            <span id="userName">Nicht angemeldet</span>
+        </div>
+
+        <div class="btn-list">
+            <button class="menu-btn login-btn" id="authBtn" onclick="toggleLogin()">Anmelden mit Google</button>
+            <button class="menu-btn">⚒️ Bauen</button>
+            <button class="menu-btn">🗺️ Weltkarte ansehen</button>
+            <button class="menu-btn">⚙️ Optionen</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. ZUERST Variable für User deklarieren
+        let currentUser = null;
+
+        // 2. Firebase Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBPKcLz9PHXrdXPIo7nXA0ViMy3iI-LoI",
+            authDomain: "caelix-immobilie.firebaseapp.com",
+            projectId: "caelix-immobilie",
+            storageBucket: "caelix-immobilie.firebasestorage.app",
+            messagingSenderId: "746238817765",
+            appId: "1:746238817765:web:6eb238182917fe64aeeb0c",
+            measurementId: "G-1EHP6PR204"
+        };
+
+        // 3. Firebase initialisieren
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // 4. Status der Anmeldung überwachen
+        auth.onAuthStateChanged((user) => {
+            const userNameEl = document.getElementById('userName');
+            const authBtn = document.getElementById('authBtn');
+            const userStatusEl = document.getElementById('userStatus');
+
+            if (user) {
+                currentUser = user;
+                userNameEl.innerText = user.displayName || "Caeli-Mitglied";
+                
+                // Profilbild hinzufügen, falls vorhanden
+                if (user.photoURL) {
+                    let img = userStatusEl.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        userStatusEl.insertBefore(img, userNameEl);
+                    }
+                    img.src = user.photoURL;
+                }
+
+                authBtn.innerText = "Abmelden";
+                authBtn.classList.remove('login-btn');
+                authBtn.classList.add('logout-btn');
+            } else {
+                currentUser = null;
+                userNameEl.innerText = "Nicht angemeldet";
+                
+                const img = userStatusEl.querySelector('img');
+                if (img) img.remove();
+
+                authBtn.innerText = "Anmelden mit Google";
+                authBtn.classList.remove('logout-btn');
+                authBtn.classList.add('login-btn');
+            }
+        });
+
+        // 5. An-/Abmelden Funktion
+        function toggleLogin() {
+            if (currentUser) {
+                auth.signOut();
+            } else {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider).catch((error) => {
+                    alert("Fehler beim Anmelden: " + error.message);
+                });
+            }
         }
-
-        .modal-content {
-            background: #1a102f;
-            border: 1px solid #a855f7;
-            padding: 30px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            text-align: left;
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
-        }
-
-        .modal-content h2 {
-            font-family: 'Cinzel', serif;
-            color: #e2c0ff;
-            margin-bottom: 20px;
-            text-align: center;
-```
+    </script>
+</body>
+</html>
