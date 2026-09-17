@@ -36,35 +36,34 @@
             position: relative; z-index: 2; width: 90%; max-width: 440px;
             background: rgba(20, 15, 35, 0.85);
             border: 1px solid rgba(180, 140, 255, 0.3);
-            border-radius: 20px; padding: 35px 25px; text-align: center;
+            border-radius: 20px; padding: 25px; text-align: center;
             box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
-            transition: all 0.3s ease;
+            max-height: 90vh; overflow-y: auto;
         }
 
         h1 {
-            font-family: 'Cinzel', serif; font-size: 2.5rem; letter-spacing: 3px;
+            font-family: 'Cinzel', serif; font-size: 2.2rem; letter-spacing: 3px;
             color: #e2c0ff; text-shadow: 0 0 15px rgba(186, 85, 211, 0.8);
         }
 
-        .subtitle { font-size: 0.85rem; color: #b3a5d0; margin-bottom: 20px; }
+        .subtitle { font-size: 0.85rem; color: #b3a5d0; margin-bottom: 15px; }
 
-        .auth-box { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .auth-title { font-size: 1rem; color: #d8b4fe; font-weight: 600; margin-bottom: 5px; }
+        .auth-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .auth-title { font-size: 0.9rem; color: #d8b4fe; font-weight: 600; }
 
-        .auth-box input, .add-form input {
+        .auth-box input, .add-form input, .code-input-box input, .admin-box input {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(192, 132, 252, 0.3);
-            padding: 10px; border-radius: 8px; color: #fff; font-size: 0.85rem;
-            outline: none; width: 100%; margin-bottom: 8px;
+            padding: 9px; border-radius: 8px; color: #fff; font-size: 0.85rem;
+            outline: none; width: 100%; margin-bottom: 5px;
         }
-        .auth-box input::placeholder, .add-form input::placeholder { color: #aaa; }
 
         .auth-btn-group { display: flex; gap: 10px; }
 
         .btn {
             background: linear-gradient(135deg, rgba(126, 34, 206, 0.8), rgba(88, 28, 135, 0.8));
-            border: 1px solid rgba(192, 132, 252, 0.4); color: #fff; padding: 12px;
-            font-size: 0.95rem; font-weight: 600; border-radius: 10px; cursor: pointer;
+            border: 1px solid rgba(192, 132, 252, 0.4); color: #fff; padding: 10px;
+            font-size: 0.9rem; font-weight: 600; border-radius: 10px; cursor: pointer;
             width: 100%; transition: all 0.2s ease;
         }
         .btn:hover { background: rgba(168, 85, 247, 0.9); }
@@ -72,10 +71,36 @@
 
         .user-info {
             background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.4);
-            padding: 10px; border-radius: 10px; margin-bottom: 15px; display: none;
+            padding: 8px; border-radius: 10px; margin-bottom: 12px; display: none; font-size: 0.8rem;
         }
 
-        .menu-list { display: flex; flex-direction: column; gap: 10px; }
+        /* Admin Code Erstellungs-Box im Menü */
+        .admin-box {
+            background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(248, 113, 113, 0.4);
+            border-radius: 10px; padding: 12px; margin-bottom: 15px; text-align: left; display: none;
+        }
+        .admin-box-title { font-size: 0.85rem; font-weight: 600; color: #fca5a5; margin-bottom: 8px; }
+
+        /* Eigene Immobilien-Verwaltung */
+        .my-properties-box {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(180, 140, 255, 0.2);
+            border-radius: 10px; padding: 10px; margin-bottom: 15px; text-align: left; display: none;
+        }
+        .my-properties-title { font-size: 0.85rem; font-weight: 600; color: #d8b4fe; margin-bottom: 6px; }
+        .property-card {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; font-size: 0.75rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .property-card button {
+            background: #a855f7; border: none; color: #fff; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem;
+        }
+
+        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .back-btn {
+            position: absolute; top: 20px; left: 20px; z-index: 15; width: auto; padding: 10px 20px;
+        }
 
         /* --- WELTKARTEN OVERLAY --- */
         #mapScreen {
@@ -122,39 +147,46 @@
 
         /* Info-Box für Bezirke & Bewohner */
         .district-info-panel {
-            position: absolute; top: 20px; right: 20px; width: 330px;
+            position: absolute; top: 20px; right: 20px; width: 350px;
             background: rgba(20, 15, 35, 0.92); border: 1px solid rgba(180, 140, 255, 0.4);
             border-radius: 15px; padding: 20px; color: #fff; z-index: 15;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); display: none;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8); display: none; max-height: 90vh; overflow-y: auto;
         }
         .district-info-panel h2 { font-family: 'Cinzel', serif; color: #e2c0ff; margin-bottom: 2px; }
         .capital-name { font-size: 0.85rem; color: #a7f3d0; margin-bottom: 10px; font-weight: 600; }
         
-        .resident-list { margin-top: 10px; max-height: 200px; overflow-y: auto; text-align: left; }
+        .resident-list { margin-top: 10px; max-height: 180px; overflow-y: auto; text-align: left; }
         .resident-item {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem;
+            padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.8rem;
         }
         .resident-item strong { color: #d8b4fe; }
 
         .add-form { margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: none; }
 
-        .back-btn {
-            position: absolute; top: 20px; left: 20px; z-index: 15; width: auto; padding: 10px 20px;
+        /* --- OVERLAYS --- */
+        #codeScreen, #optionsScreen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(8, 4, 13, 0.9); z-index: 20; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
+        .popup-container {
+            width: 90%; max-width: 440px; background: rgba(20, 15, 35, 0.95);
+            border: 1px solid rgba(180, 140, 255, 0.4); border-radius: 20px;
+            padding: 30px; text-align: center; box-shadow: 0 0 35px rgba(138, 43, 226, 0.4);
+        }
+        .popup-container h2 { font-family: 'Cinzel', serif; color: #e2c0ff; margin-bottom: 10px; font-size: 1.8rem; }
     </style>
 </head>
 <body>
 
     <div class="overlay"></div>
 
-    <!-- HINTERGRUNDMUSIK PLAYER (direkt aus dem Hauptordner) -->
     <audio id="bgMusic" loop>
         <source src="Archive.mp3" type="audio/mpeg">
         Dein Browser unterstützt das Audio-Element nicht.
     </audio>
 
-    <!-- MUSIK BUTTON (Unten Links) -->
     <div style="position: fixed; bottom: 20px; left: 20px; z-index: 100;">
         <button class="btn btn-sec" onclick="toggleMusic()" id="musicBtn" style="padding: 8px 15px; font-size: 0.8rem;">
             🔇 Musik an
@@ -170,6 +202,19 @@
             <span id="userEmail"></span>
         </div>
 
+        <!-- ADMIN SCHREIBTISCH: Code Generator im Menü -->
+        <div class="admin-box" id="adminCodeGeneratorBox">
+            <div class="admin-box-title">👑 Admin: Aktivierungscode erstellen</div>
+            <input type="text" id="adminNewCode" placeholder="Code (z.B. grh_Sommerhaus)">
+            <button class="btn" style="padding: 6px; font-size: 0.8rem; background: #ef4444;" onclick="adminGenerateCode()">Code generieren & freigeben</button>
+        </div>
+
+        <!-- Eigene Immobilien Dashboard -->
+        <div class="my-properties-box" id="myPropertiesBox">
+            <div class="my-properties-title">🏡 Meine Grundstücke & Gebäude:</div>
+            <div id="myPropertiesList"></div>
+        </div>
+
         <div class="auth-box" id="authBox">
             <div class="auth-title">Login / Registrieren</div>
             <input type="email" id="email" placeholder="E-Mail Adresse">
@@ -181,12 +226,47 @@
             </div>
         </div>
 
-        <button class="btn btn-sec" id="logoutBtn" style="display:none; margin-bottom: 15px;" onclick="logout()">Abmelden</button>
+        <button class="btn btn-sec" id="logoutBtn" style="display:none; margin-bottom: 10px;" onclick="logout()">Abmelden</button>
 
         <div class="menu-list">
-            <button class="btn">⚒️ Bauen</button>
+            <button class="btn" onclick="openCodeScreen()">⚒️ Immobilien Code einlösen</button>
             <button class="btn" onclick="openMap()">🗺️ Weltkarte ansehen</button>
-            <button class="btn btn-sec">⚙️ Optionen</button>
+            <button class="btn btn-sec" onclick="openOptions()">⚙️ Optionen & Credits</button>
+        </div>
+    </div>
+
+    <!-- IMMOBILIEN CODE EINLÖSEN OVERLAY -->
+    <div id="codeScreen">
+        <div class="popup-container">
+            <h2>Immobilien Code</h2>
+            <div class="subtitle">Gib einen Code ein, um dein Gebäude freizuschalten</div>
+            
+            <div class="code-input-box">
+                <input type="text" id="immoCodeInput" placeholder="z.B. grh123 oder erstellter Code">
+            </div>
+
+            <button class="btn" onclick="submitImmoCode()" style="margin-bottom: 10px;">Grundstück freischalten</button>
+            <button class="btn btn-sec" onclick="closeCodeScreen()">Zurück</button>
+        </div>
+    </div>
+
+    <!-- OPTIONEN & CREDITS -->
+    <div id="optionsScreen">
+        <div class="popup-container">
+            <h2>Optionen & Credits</h2>
+            
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-size: 0.85rem; color: #d8b4fe;">🎵 Lautstärke</label>
+                <input type="range" min="0" max="1" step="0.05" value="0.3" oninput="changeVolume(this.value)" style="width:100%; accent-color:#a855f7;">
+            </div>
+
+            <div style="font-size: 0.8rem; color: #b3a5d0; text-align: left; margin-bottom: 15px; line-height: 1.5;">
+                • <b>Seite:</b> Github<br>
+                • <b>Musik:</b> vampanella<br>
+                • <b>Assets:</b> antarcticbees, nnda, Xonha
+            </div>
+
+            <button class="btn" onclick="closeOptions()">Schließen</button>
         </div>
     </div>
 
@@ -194,24 +274,22 @@
     <div id="mapScreen">
         <button class="btn btn-sec back-btn" onclick="closeMapOrResetZoom()">← Zurück</button>
 
-        <!-- BEZIRKS INFO PANEL -->
         <div class="district-info-panel" id="infoPanel">
             <h2 id="districtTitle">Bezirk Name</h2>
             <div class="capital-name" id="districtCapital">Hauptstadt: -</div>
             
             <div class="resident-list">
-                <div style="font-weight: 600; margin-bottom: 5px; color: #e2c0ff;">🏘️ Bewohner & Apartments:</div>
-                <div id="residentEntries">
-                    <!-- Wird dynamisch befüllt -->
-                </div>
+                <div style="font-weight: 600; margin-bottom: 5px; color: #e2c0ff;">🏘️ Eingetragene Grundstücke:</div>
+                <div id="residentEntries"></div>
             </div>
 
-            <!-- Eintragen Formular (Nur für den Admin sichtbar) -->
+            <!-- ADMIN DIREKT-EINTRAGUNG AUF DER KARTE -->
             <div class="add-form" id="adminAddForm">
-                <div style="font-weight: 600; font-size: 0.85rem; color: #d8b4fe; margin-bottom: 8px;">+ Bewohner/Wohnung eintragen</div>
-                <input type="text" id="newHouse" placeholder="Haus / Apt. (z.B. Haus 3)">
-                <input type="text" id="newResident" placeholder="Bewohner Name">
-                <button class="btn" style="padding: 8px; font-size: 0.85rem;" onclick="addResident()">Eintragen</button>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #fca5a5; margin-bottom: 8px;">👑 Admin: Grundstück direkt eintragen</div>
+                <input type="text" id="newResidentName" placeholder="Name des Bewohners">
+                <input type="text" id="newHouseAddress" placeholder="Adresse / Haus (z.B. Hauptstraße 4)">
+                <input type="text" id="newPropertyType" placeholder="Immobilienart (z.B. Villa / 128x128)">
+                <button class="btn" style="padding: 8px; font-size: 0.85rem; background: #ef4444;" onclick="adminAddResidentDirectly()">In Karte eintragen</button>
             </div>
         </div>
 
@@ -219,34 +297,13 @@
             <div class="map-wrapper" id="mapWrapper">
                 <img src="https://i.postimg.cc/vmxxxsqX/map-caeli11.png" alt="Caeli Weltkarte">
 
-                <!-- 7 Bezirke Hotspots mit Hauptstädten -->
-                <div class="district-hotspot" style="top: 25%; left: 30%; width: 12%; height: 18%;" onclick="zoomToDistrict('Bolivora', 'Cascadia', 30, 25)">
-                    <span class="district-label">Bolivora</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 20%; left: 55%; width: 14%; height: 20%;" onclick="zoomToDistrict('Norvalla', 'Grimskov', 55, 20)">
-                    <span class="district-label">Norvalla</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 45%; left: 20%; width: 13%; height: 18%;" onclick="zoomToDistrict('Goryeo', 'Liuyin', 20, 45)">
-                    <span class="district-label">Goryeo</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 45%; left: 45%; width: 15%; height: 22%;" onclick="zoomToDistrict('Danubia', 'Boskar', 45, 45)">
-                    <span class="district-label">Danubia</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 50%; left: 70%; width: 12%; height: 18%;" onclick="zoomToDistrict('Aridia', 'Riyassa', 70, 50)">
-                    <span class="district-label">Aridia</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 70%; left: 35%; width: 14%; height: 18%;" onclick="zoomToDistrict('Vistalia', 'Solmara', 35, 70)">
-                    <span class="district-label">Vistalia</span>
-                </div>
-
-                <div class="district-hotspot" style="top: 72%; left: 60%; width: 12%; height: 18%;" onclick="zoomToDistrict('Rosvalise', 'Blumburry', 60, 72)">
-                    <span class="district-label">Rosvalise</span>
-                </div>
+                <div class="district-hotspot" style="top: 25%; left: 30%; width: 12%; height: 18%;" onclick="zoomToDistrict('Bolivora', 'Cascadia', 30, 25)"><span class="district-label">Bolivora</span></div>
+                <div class="district-hotspot" style="top: 20%; left: 55%; width: 14%; height: 20%;" onclick="zoomToDistrict('Norvalla', 'Grimskov', 55, 20)"><span class="district-label">Norvalla</span></div>
+                <div class="district-hotspot" style="top: 45%; left: 20%; width: 13%; height: 18%;" onclick="zoomToDistrict('Goryeo', 'Liuyin', 20, 45)"><span class="district-label">Goryeo</span></div>
+                <div class="district-hotspot" style="top: 45%; left: 45%; width: 15%; height: 22%;" onclick="zoomToDistrict('Danubia', 'Boskar', 45, 45)"><span class="district-label">Danubia</span></div>
+                <div class="district-hotspot" style="top: 50%; left: 70%; width: 12%; height: 18%;" onclick="zoomToDistrict('Aridia', 'Riyassa', 70, 50)"><span class="district-label">Aridia</span></div>
+                <div class="district-hotspot" style="top: 70%; left: 35%; width: 14%; height: 18%;" onclick="zoomToDistrict('Vistalia', 'Solmara', 35, 70)"><span class="district-label">Vistalia</span></div>
+                <div class="district-hotspot" style="top: 72%; left: 60%; width: 12%; height: 18%;" onclick="zoomToDistrict('Rosvalise', 'Blumburry', 60, 72)"><span class="district-label">Rosvalise</span> vom</div>
             </div>
         </div>
     </div>
@@ -264,12 +321,19 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Admin-E-Mail definieren
         const ADMIN_EMAIL = "caelixadmin@gmail.com";
 
-        // Musik-Steuerung
+        // Datenbank für Bezirke und gültige Aktivierungscodes
+        const BEZIRKE_DATEN = {
+            "Bolivora": [], "Norvalla": [], "Goryeo": [],
+            "Danubia": [], "Aridia": [], "Vistalia": [], "Rosvalise": []
+        };
+
+        // Speichert erstellte Admin-Codes (Code -> Objektdaten)
+        const VALID_CODES = {};
+
         const music = document.getElementById('bgMusic');
-        music.volume = 0.3; // Lautstärke auf 30%
+        music.volume = 0.3;
 
         function toggleMusic() {
             if (music.paused) {
@@ -281,26 +345,158 @@
             }
         }
 
+        function changeVolume(val) { music.volume = val; }
+        function openOptions() { document.getElementById('optionsScreen').style.display = 'flex'; }
+        function closeOptions() { document.getElementById('optionsScreen').style.display = 'none'; }
+        function openCodeScreen() { document.getElementById('codeScreen').style.display = 'flex'; }
+        function closeCodeScreen() { document.getElementById('codeScreen').style.display = 'none'; }
+
+        // --- ADMIN: CODE ERSTELLEN ---
+        function adminGenerateCode() {
+            const user = auth.currentUser;
+            if (!user || user.email !== ADMIN_EMAIL) return alert("Nur der Admin kann Codes generieren!");
+
+            const rawCode = document.getElementById('adminNewCode').value.trim();
+            if (!rawCode) return alert("Bitte gib einen Code ein.");
+
+            const code = rawCode.toLowerCase();
+            let propertyType = "";
+            let pixelSize = "";
+
+            // Automatische Pixelgrößen-Bestimmung nach Präfix
+            if (code.startsWith("woh")) { propertyType = "Wohnung"; pixelSize = "32x32 Pixel"; }
+            else if (code.startsWith("apa")) { propertyType = "Apartment"; pixelSize = "48x48 Pixel"; }
+            else if (code.startsWith("klh")) { propertyType = "Kleines Haus"; pixelSize = "64x64 Pixel"; }
+            else if (code.startsWith("grh")) { propertyType = "Großes Haus"; pixelSize = "96x96 Pixel"; }
+            else if (code.startsWith("vill")) { propertyType = "Villa"; pixelSize = "128x128 Pixel"; }
+            else if (code.startsWith("spe")) { propertyType = "Spezial-Immobilie"; pixelSize = "160x160 Pixel"; }
+            else if (code.startsWith("ref")) { propertyType = "Refugium"; pixelSize = "192x192 Pixel"; }
+            else { propertyType = "Standard Grundstück"; pixelSize = "64x64 Pixel"; } // Fallback
+
+            VALID_CODES[code] = {
+                type: propertyType,
+                size: pixelSize,
+                label: `${propertyType} (${pixelSize}) [${rawCode.toUpperCase()}]`
+            };
+
+            alert(`Code "${rawCode.toUpperCase()}" erfolgreich erstellt!\nTyp: ${propertyType} (${pixelSize})`);
+            document.getElementById('adminNewCode').value = "";
+        }
+
+        // --- NUTZER LÖST CODE EIN ---
+        function submitImmoCode() {
+            const user = auth.currentUser;
+            if (!user) return alert("Du musst eingeloggt sein!");
+
+            const rawCode = document.getElementById('immoCodeInput').value.trim();
+            if (!rawCode) return alert("Bitte gib einen Code ein.");
+            const code = rawCode.toLowerCase();
+
+            let propDetails = VALID_CODES[code];
+
+            // Wenn kein Admin-Code, Standard-Präfix Erkennung prüfen
+            if (!propDetails) {
+                let propertyType = "";
+                let pixelSize = "";
+                if (code.startsWith("woh")) { propertyType = "Wohnung"; pixelSize = "32x32 Pixel"; }
+                else if (code.startsWith("apa")) { propertyType = "Apartment"; pixelSize = "48x48 Pixel"; }
+                else if (code.startsWith("klh")) { propertyType = "Kleines Haus"; pixelSize = "64x64 Pixel"; }
+                else if (code.startsWith("grh")) { propertyType = "Großes Haus"; pixelSize = "96x96 Pixel"; }
+                else if (code.startsWith("vill")) { propertyType = "Villa"; pixelSize = "128x128 Pixel"; }
+                else if (code.startsWith("spe")) { propertyType = "Spezial-Immobilie"; pixelSize = "160x160 Pixel"; }
+                else if (code.startsWith("ref")) { propertyType = "Refugium"; pixelSize = "192x192 Pixel"; }
+                else { return alert("Ungültiger Code!"); }
+
+                propDetails = { type: propertyType, size: pixelSize, label: `${propertyType} (${pixelSize}) [${rawCode.toUpperCase()}]` };
+            }
+
+            const targetDistrict = "Bolivora"; // Standard-Bezirk für User-Einlösung
+            BEZIRKE_DATEN[targetDistrict].push({
+                id: Date.now(),
+                haus: propDetails.label,
+                bezirk: targetDistrict,
+                bewohner: user.email
+            });
+
+            alert(`Grundstück freigeschaltet!\nTyp: ${propDetails.label}`);
+            document.getElementById('immoCodeInput').value = "";
+            closeCodeScreen();
+            updateUserProperties();
+        }
+
+        // --- EIGENE IMMOBILIEN ANZEIGEN & UMBAUEN ---
+        function updateUserProperties() {
+            const user = auth.currentUser;
+            const container = document.getElementById('myPropertiesList');
+            container.innerHTML = "";
+            if (!user) return;
+
+            let userProperties = [];
+            for (let bezirk in BEZIRKE_DATEN) {
+                BEZIRKE_DATEN[bezirk].forEach(item => {
+                    if (item.bewohner === user.email) {
+                        userProperties.push({ ...item, actualDistrict: bezirk });
+                    }
+                });
+            }
+
+            if (userProperties.length === 0) {
+                container.innerHTML = "<div style='color: #aaa; font-size: 0.7rem;'>Du hast noch keine Grundstücke.</div>";
+                return;
+            }
+
+            userProperties.forEach(prop => {
+                container.innerHTML += `
+                    <div class="property-card">
+                        <div>📍 <b>${prop.actualDistrict}</b><br>${prop.haus}</div>
+                        <button onclick="editProperty(${prop.id}, '${prop.actualDistrict}')">Umbauen</button>
+                    </div>
+                `;
+            });
+        }
+
+        function editProperty(id, district) {
+            const list = BEZIRKE_DATEN[district];
+            const index = list.findIndex(p => p.id === id);
+            if (index === -1) return;
+
+            const newName = prompt("Möchtest du dein Gebäude umbenennen / umbauen?", list[index].haus);
+            if (newName !== null && newName.trim() !== "") {
+                list[index].haus = newName.trim();
+                updateUserProperties();
+                if (currentDistrict === district) renderResidents();
+                alert("Erfolgreich umgebaut!");
+            }
+        }
+
+        // --- AUTH & ADMIN SICHTBARKEIT ---
         auth.onAuthStateChanged((user) => {
             const adminForm = document.getElementById('adminAddForm');
+            const adminCodeBox = document.getElementById('adminCodeGeneratorBox');
+            const myPropsBox = document.getElementById('myPropertiesBox');
 
             if (user) {
                 document.getElementById('authBox').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'block';
                 document.getElementById('logoutBtn').style.display = 'block';
-                document.getElementById('userEmail').innerText = "Eingeloggt als: " + user.email;
+                document.getElementById('userEmail').innerText = "Eingeloggt: " + user.email;
+                myPropsBox.style.display = 'block';
+                updateUserProperties();
 
-                // Prüfen, ob der eingeloggte User der Admin ist
                 if (user.email === ADMIN_EMAIL) {
                     adminForm.style.display = 'block';
+                    adminCodeBox.style.display = 'block';
                 } else {
                     adminForm.style.display = 'none';
+                    adminCodeBox.style.display = 'none';
                 }
             } else {
                 document.getElementById('authBox').style.display = 'flex';
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'none';
+                myPropsBox.style.display = 'none';
                 adminForm.style.display = 'none';
+                adminCodeBox.style.display = 'none';
             }
         });
 
@@ -327,24 +523,11 @@
         let isZoomed = false;
         let currentDistrict = "";
 
-        const BEZIRKE_DATEN = {
-            "Bolivora": [],
-            "Norvalla": [],
-            "Goryeo": [],
-            "Danubia": [],
-            "Aridia": [],
-            "Vistalia": [],
-            "Rosvalise": []
-        };
-
-        function openMap() {
-            document.getElementById('mapScreen').style.display = 'block';
-        }
+        function openMap() { document.getElementById('mapScreen').style.display = 'block'; }
 
         function closeMapOrResetZoom() {
             if (isZoomed) {
-                const wrapper = document.getElementById('mapWrapper');
-                wrapper.style.transform = "scale(1) translate(0px, 0px)";
+                document.getElementById('mapWrapper').style.transform = "scale(1) translate(0px, 0px)";
                 document.getElementById('infoPanel').style.display = 'none';
                 isZoomed = false;
             } else {
@@ -355,7 +538,6 @@
         function zoomToDistrict(name, capital, xPercent, yPercent) {
             currentDistrict = name;
             const wrapper = document.getElementById('mapWrapper');
-            
             const translateX = (50 - xPercent) * 0.8;
             const translateY = (50 - yPercent) * 0.8;
 
@@ -372,11 +554,10 @@
         function renderResidents() {
             const listContainer = document.getElementById('residentEntries');
             listContainer.innerHTML = "";
-
             const eintraege = BEZIRKE_DATEN[currentDistrict] || [];
 
             if (eintraege.length === 0) {
-                listContainer.innerHTML = "<div style='color: #aaa; font-size:0.8rem;'>Noch keine Bewohner eingetragen.</div>";
+                listContainer.innerHTML = "<div style='color: #aaa; font-size:0.8rem;'>Noch keine Grundstücke in diesem Bezirk.</div>";
             } else {
                 eintraege.forEach(item => {
                     listContainer.innerHTML += `
@@ -389,28 +570,37 @@
             }
         }
 
-        function addResident() {
+        // Admin trägt direkt in der Weltkarte ein: Name, Adresse, Immobilienart
+        function adminAddResidentDirectly() {
             const user = auth.currentUser;
-            if (!user || user.email !== ADMIN_EMAIL) {
-                return alert("Keine Berechtigung! Nur der Administrator darf Bewohner eintragen.");
-            }
+            if (!user || user.email !== ADMIN_EMAIL) return alert("Keine Admin-Berechtigung!");
 
-            const house = document.getElementById('newHouse').value.trim();
-            const resident = document.getElementById('newResident').value.trim();
+            const residentName = document.getElementById('newResidentName').value.trim();
+            const houseAddress = document.getElementById('newHouseAddress').value.trim();
+            const propertyType = document.getElementById('newPropertyType').value.trim();
 
-            if (!house || !resident) {
-                return alert("Bitte Haus/Wohnung und Bewohner eintragen.");
+            if (!residentName || !houseAddress || !propertyType) {
+                return alert("Bitte fülle alle Felder aus (Name, Adresse, Immobilienart).");
             }
 
             if (!BEZIRKE_DATEN[currentDistrict]) {
                 BEZIRKE_DATEN[currentDistrict] = [];
             }
 
-            BEZIRKE_DATEN[currentDistrict].push({ haus: house, bewohner: resident });
+            BEZIRKE_DATEN[currentDistrict].push({
+                id: Date.now(),
+                haus: `${houseAddress} — ${propertyType}`,
+                bezirk: currentDistrict,
+                bewohner: residentName
+            });
 
-            document.getElementById('newHouse').value = "";
-            document.getElementById('newResident').value = "";
+            // Felder leeren
+            document.getElementById('newResidentName').value = "";
+            document.getElementById('newHouseAddress').value = "";
+            document.getElementById('newPropertyType').value = "";
+
             renderResidents();
+            alert(`Erfolgreich in ${currentDistrict} eingetragen!`);
         }
     </script>
 </body>
